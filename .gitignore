@@ -1,0 +1,5 @@
+data/
+utils/__pycache__
+utils/models/__pycache__
+.ipynb_checkpoints/
+checkpoints/
