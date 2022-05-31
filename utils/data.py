@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 
+## Load data
 def read_npz_file( path: str, info: bool=False ) -> list:
     data = np.load(path)
     labels = {}
@@ -13,30 +14,46 @@ def read_npz_file( path: str, info: bool=False ) -> list:
         labels[key] = 0
         if info:
             print(f"Key: '{key}',   Shape: {data[key].shape}")
-    
-    # showers = npz_data["time"]
-    # energy = npz_data["logE"]
-    # showers[np.isnan(showers)] = 0.
-    # showers = showers.reshape(-1, 1, 9, 9)
-    # return showers, energy
-    return [data, labels]
+
+    return data
 
 
+def get_data( options: bool=False ) -> list:
+    data = read_npz_file("./data/airshower.npz", info=options)
+    return [
+        data["signal"], 
+        data["time"], 
+        data["logE"], 
+        data["mass"], 
+        data["Xmax"], 
+        # data['showermax'],
+        # data['showeraxis'],
+        # data['showercore'],
+        # data["detector"]
+    ]
+
+
+## Plot signals
 def detectors_grid( n_detectors: int=9 ) -> np.array:
     n0 = (n_detectors-1)/2
     return (np.mgrid[0:n_detectors, 0:n_detectors].astype(np.float32) - n0)
 
 
-def plot_signals_arrival_times( signals_batch: np.array, n_detectors: int=9, N: int=2, random: bool=False, grid: bool=True, show: int=False ) -> matplotlib.figure.Figure:
+def plot_signals_arrival_times( signals_batch: np.array, labels=[],n_detectors: int=9, N: int=2, random: bool=False, grid: bool=True, show: int=False ) -> matplotlib.figure.Figure:
     fig, axes = plt.subplots(nrows=N, ncols=N, figsize=(13,10), dpi=100)
     axes = axes.squeeze()
     axes = axes.flatten()
 
     iterator = np.random.choice(signals_batch.shape[0], N*N) if random else np.arange(N*N)
 
+    title = "Energy: {}" if len(labels) != 0 else "Signal"
+
     for i,j in enumerate(iterator):
         ax = axes[i]
         signal = signals_batch[j].reshape(n_detectors, n_detectors)
+
+        if len(labels) != 0:
+            title = title.format(labels[j])
 
         ## Plot detectors grid
         xd, yd = detectors_grid(n_detectors=n_detectors)
@@ -51,7 +68,7 @@ def plot_signals_arrival_times( signals_batch: np.array, n_detectors: int=9, N: 
         ax.grid(grid)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
-        ax.set_title("string")
+        ax.set_title(title)
     
     fig.tight_layout()
     if not show:
@@ -59,20 +76,7 @@ def plot_signals_arrival_times( signals_batch: np.array, n_detectors: int=9, N: 
     return fig
 
 
-def get_data( options: bool=False ) -> list:
-    data, labels = read_npz_file("./data/airshower.npz", info=options)
-    return [data["signal"], data["time"], data["logE"], data["mass"], data["Xmax"]]
-    # data = read_npz_file("./data/airshower.npz", info=options)
-    # showers, energy = read_npz_file("./data/airshower.npz", options=info)
-    # for shower in showers:
-    #     a, b = 1, 2
-    #     mask = shower != 0
-    #     min_val = shower.min()
-    #     max_val = shower.max()
-    #     shower[mask] = (b-a)*( (shower[mask]-min_val) / (max_val - min_val) ) + a    
-    # return showers, energy
-
-
+## Preprocess data
 def showerMapDomain( shower: np.array, interval: list=[-1,1] ) -> np.array:
     a,b = interval
     mask = shower != 0

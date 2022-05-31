@@ -63,7 +63,8 @@ class Generator( nn.Module ):
             self._block( features_gen * 4, features_gen * 2, 3, 1, 0 ),
             # self._block( features_gen * 2, features_gen * 2, 3, 1, 1 ),
             self._block( features_gen * 2, features_gen * 2, 3, 1, 0 ),
-            self._block( features_gen * 2, channels_img, 3, 1, 1 ),
+            # self._block( features_gen * 2, channels_img, 3, 1, 1 ),
+            nn.ConvTranspose2d( features_gen * 2, channels_img, kernel_size=3, stride=1, padding=1 ),
             nn.ReLU(),
         )
         self.embed = nn.Embedding( num_classes, embed_size )
@@ -72,7 +73,7 @@ class Generator( nn.Module ):
     def _block( self, in_channels: int, out_channels: int, kernel_size: int, stride: int, padding: int ) -> nn.modules.container.Sequential:
         return nn.Sequential(
             nn.ConvTranspose2d( in_channels, out_channels, kernel_size, stride, padding, bias=False ),
-            # nn.BatchNorm2d(out_channels),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(),
         )
     

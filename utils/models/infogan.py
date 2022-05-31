@@ -1,3 +1,4 @@
+# INFOGAN
 import torch
 from torch import nn,Tensor
 
@@ -7,8 +8,9 @@ class Generator( nn.Module ):
         self,
         latent_dim: int,
         channels_img: int,
-        img_size: int,
+        features_gen: int,
         num_classes: int,
+        img_size: int,
         code_dim: int,
         layer_name: str="Block"
     ) -> None:

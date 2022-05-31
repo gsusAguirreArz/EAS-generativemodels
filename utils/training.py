@@ -152,13 +152,13 @@ def get_checkpoint(PATH: str, show_info: bool=False):
     return checkpoint
 
 
-def load_state_dicts(checkpoint: dict, models: list, optimizers: list) -> None:
+def load_state_dicts(checkpoint: dict, models: list) -> None:
     # print("====> Loading states dicts")
     for i, model in enumerate(models):
         model.load_state_dict(checkpoint[f"{model.layer_name}_{i}_state_dict"])
-    for i, optimizer in enumerate(optimizers):
-        optimizer.load_state_dict(checkpoint[f"optimizer_{i}_state_dict"])
-    # print("Success")
+    # for i, optimizer in enumerate(optimizers):
+    #     optimizer.load_state_dict(checkpoint[f"optimizer_{i}_state_dict"])
+    print("Success")
     return
 
 
